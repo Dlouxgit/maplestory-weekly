@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>GMS Weekly</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <script
+      src="https://unpkg.com/react@latest/umd/react.development.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://unpkg.com/react-dom@latest/umd/react-dom.development.js"></script>
+    <script
+      src="https://unpkg.com/@mui/material@latest/umd/material-ui.development.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://unpkg.com/babel-standalone@latest/babel.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Fonts to support Material Design -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+    />
+    <!-- Icons to support Material Design -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const {
+        colors,
+        CssBaseline,
+        ThemeProvider,
+        Typography,
+        Container,
+        createTheme,
+        Box,
+        SvgIcon,
+        Link,
+        Table,
+        TableBody,
+        TableCell,
+        TableContainer,
+        TableHead,
+        TableRow,
+        Paper,
+        Checkbox,
+        TextField,
+        Input,
+        DeleteIcon,
+        Button,
+      } = MaterialUI;
+
+      // Create a theme instance.
+      const theme = createTheme({
+        palette: {
+          primary: {
+            main: "#556cd6",
+          },
+          secondary: {
+            main: "#19857b",
+          },
+          error: {
+            main: colors.red.A400,
+          },
+        },
+      });
+      function createData(name, level, one, two, three, four, five, six, boss) {
+        return { name, level, one, two, three, four, five, six, boss };
+      }
+
+      const defaultRows = [
+        createData(
+          "SetYourCharacterName",
+          200,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ),
+      ];
+
+      const cnMap = {
+        one: "一岛",
+        two: "二岛",
+        three: "三岛",
+        four: "四岛",
+        five: "五岛",
+        six: "六岛",
+        clearAll: "全部完成",
+        level: "等级",
+        name: "角色名",
+        remove: "删除",
+        add: "添加",
+      };
+
+      const enMap = {
+        one: "VJ",
+        two: "Chu Chu",
+        three: "Lach",
+        four: "Arcana",
+        five: "Morass",
+        six: "Esfera",
+        clearAll: "Clear All",
+        level: "Level",
+        name: "Name",
+        remove: "Remove",
+        add: "Add",
+      };
+
+      const langMap = {
+        cnMap,
+        enMap,
+      };
+
+      function App() {
+        let defaultV = defaultRows;
+        try {
+          defaultV = JSON.parse(localStorage.getItem("rows")) || defaultRows;
+        } catch (e) {
+          defaultV = defaultRows;
+        }
+        let defaultLang = "enMap";
+        try {
+          defaultLang = JSON.parse(localStorage.getItem("lang")) || "enMap";
+          if (defaultLang !== "enMap" && defaultLang !== "cnMap") {
+            defaultLang = "enMap";
+          }
+        } catch (e) {
+          defaultLang = "enMap";
+        }
+        const [rows, originSetRows] = React.useState(defaultV);
+        const [lang, setLang] = React.useState(defaultLang);
+        const setRows = (value) => {
+          localStorage.setItem("rows", JSON.stringify(value));
+          originSetRows(value);
+        };
+        const handleSelectClick = (index, key, event) => {
+          const tmp = [...rows];
+          tmp[index][key] = event.target.checked;
+          setRows(tmp);
+        };
+        const handleSelectAllClick = (index, key, event) => {
+          const tmp = [...rows];
+          tmp[index].level >= 200 && (tmp[index]["one"] = event.target.checked);
+          tmp[index].level >= 210 && (tmp[index]["two"] = event.target.checked);
+          tmp[index].level >= 220 &&
+            (tmp[index]["three"] = event.target.checked);
+          tmp[index].level >= 225 &&
+            (tmp[index]["four"] = event.target.checked);
+          tmp[index].level >= 230 &&
+            (tmp[index]["five"] = event.target.checked);
+          tmp[index].level >= 235 && (tmp[index]["six"] = event.target.checked);
+          setRows(tmp);
+        };
+        return (
+          <Container>
+            <Box sx={{ my: 4 }}>
+              <Button
+                variant="contained"
+                style={{ marginBottom: "4px", marginRight: "16px" }}
+                onClick={() => {
+                  const tmp = [...rows];
+                  tmp.push(
+                    createData(
+                      "SetYourCharacterName",
+                      200,
+                      false,
+                      false,
+                      false,
+                      false,
+                      false,
+                      false,
+                      false
+                    )
+                  );
+                  setRows(tmp);
+                }}
+              >
+                {langMap[lang]["add"]}
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                style={{ marginBottom: "4px" }}
+                onClick={() => {
+                  setLang(lang === "enMap" ? "cnMap" : "enMap");
+                  localStorage.setItem("lang", lang);
+                }}
+              >
+                {lang === "enMap" ? "Toggle Language" : "切换语言"}
+              </Button>
+              <TableContainer component={Paper}>
+                <Table aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="left">
+                        {langMap[lang]["name"]}
+                      </TableCell>
+                      <TableCell align="left">
+                        {langMap[lang]["level"]}
+                      </TableCell>
+                      <TableCell align="left">
+                        {langMap[lang]["clearAll"]}
+                      </TableCell>
+                      <TableCell align="left">{langMap[lang]["one"]}</TableCell>
+                      <TableCell align="left">{langMap[lang]["two"]}</TableCell>
+                      <TableCell align="left">
+                        {langMap[lang]["three"]}
+                      </TableCell>
+                      <TableCell align="left">
+                        {langMap[lang]["four"]}
+                      </TableCell>
+                      <TableCell align="left">
+                        {langMap[lang]["five"]}
+                      </TableCell>
+                      <TableCell align="left">{langMap[lang]["six"]}</TableCell>
+                      <TableCell align="left">Boss</TableCell>
+                      <TableCell align="left">
+                        {langMap[lang]["remove"]}
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row, index) => (
+                      <TableRow
+                        key={row.name}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell>
+                          <Input
+                            defaultValue={row.name}
+                            onChange={(e) => {
+                              const tmp = [...rows];
+                              tmp[index]["name"] = e.target.value;
+                              localStorage.setItem("rows", JSON.stringify(tmp));
+                            }}
+                          />
+                        </TableCell>
+
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={row.level}
+                            max="200"
+                            min="1"
+                            onChange={(e) => {
+                              if (e.target.value > 300) {
+                                e.target.value = 300;
+                              } else if (e.target.value <= 0) {
+                                e.target.value = 1;
+                              }
+                              const tmp = [...rows];
+                              tmp[index]["level"] = e.target.value;
+                              setRows(tmp);
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            inputProps={{
+                              "aria-label": "select all desserts",
+                            }}
+                            disabled={row.level < 200}
+                            checked={
+                              row.level >= 200 &&
+                              (row.one || row.level < 200) &&
+                              (row.two || row.level < 210) &&
+                              (row.three || row.level < 220) &&
+                              (row.four || row.level < 225) &&
+                              (row.five || row.level < 230) &&
+                              (row.six || row.level < 235)
+                            }
+                            onChange={(e) =>
+                              handleSelectAllClick(index, "one", e)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            inputProps={{
+                              "aria-label": "select all desserts",
+                            }}
+                            disabled={row.level < 200}
+                            checked={row.one}
+                            onChange={(e) => handleSelectClick(index, "one", e)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            inputProps={{
+                              "aria-label": "select all desserts",
+                            }}
+                            disabled={row.level < 210}
+                            checked={row.two}
+                            onChange={(e) => handleSelectClick(index, "two", e)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            inputProps={{
+                              "aria-label": "select all desserts",
+                            }}
+                            disabled={row.level < 220}
+                            checked={row.three}
+                            onChange={(e) =>
+                              handleSelectClick(index, "three", e)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            inputProps={{
+                              "aria-label": "select all desserts",
+                            }}
+                            disabled={row.level < 225}
+                            checked={row.four}
+                            onChange={(e) =>
+                              handleSelectClick(index, "four", e)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            inputProps={{
+                              "aria-label": "select all desserts",
+                            }}
+                            disabled={row.level < 230}
+                            checked={row.five}
+                            onChange={(e) =>
+                              handleSelectClick(index, "five", e)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            inputProps={{
+                              "aria-label": "select all desserts",
+                            }}
+                            disabled={row.level < 235}
+                            checked={row.six}
+                            onChange={(e) => handleSelectClick(index, "six", e)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Checkbox
+                            color="primary"
+                            inputProps={{
+                              "aria-label": "select all desserts",
+                            }}
+                            checked={row.boss}
+                            onChange={(e) => handleSelectClick(index, "boss", e)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <SvgIcon
+                            style={{
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              const tmp = [...rows];
+                              tmp.splice(index, 1);
+                              setRows(tmp);
+                            }}
+                          >
+                            <path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z" />
+                          </SvgIcon>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          </Container>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(
+        <ThemeProvider theme={theme}>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      );
+    </script>
+  </body>
+</html>
